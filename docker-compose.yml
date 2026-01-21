@@ -1,0 +1,28 @@
+services:
+  api:
+    build:
+      context: ./back
+    container_name: my_api
+    ports:
+      - '3001:3000' # наружу 3001, внутри контейнера 3000 (поменяй под себя)
+    env_file:
+      - ./back/.env
+    volumes:
+      - api_db:/data
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ./front
+    container_name: my_web
+    ports:
+      - '3000:3000'
+    environment:
+      # В Next (если это client-side запросы) нужна PUBLIC переменная:
+      - NEXT_PUBLIC_API_URL=http://localhost:3001
+    depends_on:
+      - api
+    restart: unless-stopped
+
+volumes:
+  api_db:
